@@ -1,18 +1,32 @@
-import React, { Component } from 'react'
-import './styles/Chat.css'
-import Sidebar from './Sidebar'
-import Messages from './Messages'
+import React, { Component } from "react";
+import "./styles/Chat.css";
+import Sidebar from "./Sidebar";
+import Messages from "./Messages";
 
 class Chat extends Component {
-	// Render
-	render() {
-		return (
-			<div id="wrap">
-				<Sidebar />
-				<Messages />
-			</div>
-		)
-	}
+  state = {
+    channelId: ""
+  };
+  getChannel = id => {
+    this.setState({
+      channelId: id
+    });
+  };
+  // Render
+  render() {
+    return (
+      <>
+        <div id="wrap">
+          <div id="leftGrid">
+            <Sidebar history={this.props.history} channel={this.getChannel} />
+          </div>
+          <div>
+            <Messages channelId={this.state.channelId} />
+          </div>
+        </div>
+      </>
+    );
+  }
 }
 
-export default Chat
+export default Chat;
