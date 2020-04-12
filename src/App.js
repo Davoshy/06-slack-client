@@ -12,12 +12,22 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route path="/signup" component={Signup} />
-          <Route path="/login" component={Login} />
-          {localStorage.getItem("token") ? (
-            <Route path="/" component={Chat} />
-          ) : (
-            <Redirect to="/login" />
+          <Route
+            path="/signup"
+            component={Signup}
+            history={this.props.history}
+          />
+          <Route path="/login" component={Login} history={this.props.history} />
+          <Route
+            path="/"
+            render={() =>
+              localStorage.getItem("token") ? (
+                <Chat />
+              ) : (
+                <Redirect to="/login" />
+              )
+            }
+          />
           )}
         </Switch>
       </BrowserRouter>

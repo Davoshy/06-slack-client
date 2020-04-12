@@ -14,6 +14,17 @@ class Content extends Component {
     channelId: "5e574be79a119e2a7a166e2a"
   };
   // Lifecycle
+  componentWillMount() {
+    let token = localStorage.getItem("token");
+    let head = {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+    axios.get(`${process.env.REACT_APP_API}/messages`, head).then(res => {
+      this.setState({ messages: res.data });
+    });
+  }
   componentWillReceiveProps(props) {
     let channel = props.channelId;
     let token = localStorage.getItem("token");
@@ -44,13 +55,18 @@ class Content extends Component {
   createMessage = e => {
     e.preventDefault();
     let token = localStorage.getItem("token");
-    let body = {
-      user: "",
-      channel: this.state.channelId,
-      text: this.state.newMessage.text
-    };
+    let data = new FormData();
+    data.append("file", this.state.newMessage.file);
+    data.append("channel", this.state.channelId);
+    data.append("text", this.state.newMessage.text);
+    console.log(this.state.newMessage);
+    // let body = {
+    //   user: "",
+    //   channel: this.state.channelId,
+    //   text: this.state.newMessage.text,
+    // };
     axios
-      .post(`${process.env.REACT_APP_API}/messages`, body, {
+      .post(`${process.env.REACT_APP_API}/messages`, data, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -59,11 +75,22 @@ class Content extends Component {
         let messages = this.state.messages;
         messages.push(response.data);
         this.setState({
-          messages: messages
+          messages: messages,
+          newMessage: {
+            text: ""
+          }
         });
         let element = document.querySelector("#content");
         element.scrollTop = element.scrollHeight;
       });
+  };
+  addFile = e => {
+    let filedata = e.target.files[0];
+    let newMessage = this.state.newMessage;
+    newMessage.file = filedata;
+    this.setState({
+      newMessage: newMessage
+    });
   };
   // Render
   render() {
@@ -76,13 +103,14 @@ class Content extends Component {
                 <span className="user">{message.user.name}</span>
                 <span className="date">{message.date}</span>
                 <div className="body">{message.text}</div>
-                -> Insert Image
+                <img src={message.file} />
               </div>
             );
           })}
         </div>
         <div id="new-message">
           <form
+            id="inputMessage"
             onSubmit={e => {
               this.createMessage(e);
             }}
